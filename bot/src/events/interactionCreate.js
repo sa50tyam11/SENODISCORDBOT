@@ -90,13 +90,17 @@ module.exports = {
         const today = interaction.fields.getTextInputValue('standup_today');
         const blockers = interaction.fields.getTextInputValue('standup_blockers') || 'None';
         
-        const db = require('../database/db');
+        const StandupLog = require('../database/models/StandupLog');
         const { EmbedBuilder } = require('discord.js');
         const config = require('../config.json');
 
         try {
-          const stmt = db.prepare('INSERT INTO standup_logs (userId, yesterday, today, blockers) VALUES (?, ?, ?, ?)');
-          stmt.run(interaction.user.id, yesterday, today, blockers);
+          await StandupLog.create({
+            userId: interaction.user.id,
+            yesterday,
+            today,
+            blockers
+          });
 
           const embed = new EmbedBuilder()
             .setAuthor({ name: `${interaction.user.username}'s Standup`, iconURL: interaction.user.displayAvatarURL() })

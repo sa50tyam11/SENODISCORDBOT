@@ -2,10 +2,10 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection, Partials } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
-const { initDb } = require('./database/init');
+const { connectDB } = require('./database/db');
 
-// Initialize Database
-initDb();
+// Connect to Database
+connectDB();
 
 // Create a new client instance with required intents
 const client = new Client({

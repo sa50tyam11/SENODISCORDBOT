@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
-const db = require('../../database/db');
+const Warning = require('../../database/models/Warning');
 const { sendLog } = require('../../utils/logger');
 
 module.exports = {
@@ -22,14 +22,15 @@ module.exports = {
     const moderatorId = interaction.user.id;
 
     try {
-      // Save to SQLite DB
-      const stmt = db.prepare('INSERT INTO warnings (userId, moderatorId, reason) VALUES (?, ?, ?)');
-      stmt.run(target.id, moderatorId, reason);
+      // Save to MongoDB
+      await Warning.create({
+        userId: target.id,
+        moderatorId,
+        reason
+      });
 
       // Get total warnings
-      const countStmt = db.prepare('SELECT COUNT(*) as count FROM warnings WHERE userId = ?');
-      const result = countStmt.get(target.id);
-      const totalWarnings = result.count;
+      const totalWarnings = await Warning.countDocuments({ userId: target.id });
 
       await interaction.reply({ content: `Successfully warned <@${target.id}>. They now have ${totalWarnings} warning(s).` });
       

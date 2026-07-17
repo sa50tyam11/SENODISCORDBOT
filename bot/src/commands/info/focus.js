@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const db = require('../../database/db');
+const FocusMode = require('../../database/models/FocusMode');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -17,12 +17,11 @@ module.exports = {
     const expiresAt = new Date(Date.now() + duration * 60000).toISOString();
 
     try {
-      const stmt = db.prepare(`
-        INSERT INTO focus_mode (userId, expiresAt) 
-        VALUES (?, ?) 
-        ON CONFLICT(userId) DO UPDATE SET expiresAt=excluded.expiresAt
-      `);
-      stmt.run(interaction.user.id, expiresAt);
+      await FocusMode.findOneAndUpdate(
+        { userId: interaction.user.id },
+        { expiresAt: new Date(expiresAt) },
+        { upsert: true, new: true }
+      );
 
       const embed = new EmbedBuilder()
         .setTitle('🧘 Focus Mode Activated')

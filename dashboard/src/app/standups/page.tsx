@@ -1,15 +1,16 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Sidebar from "@/components/Sidebar";
-import db from "@/lib/db";
+import { connectDB, StandupLog } from "@/lib/db";
 
 export const dynamic = 'force-dynamic';
 
 export default async function StandupsPage() {
   const session = await getServerSession(authOptions);
 
-  // Fetch standups from sqlite
-  const standups = db.prepare('SELECT * FROM standup_logs ORDER BY createdAt DESC LIMIT 50').all();
+  // Connect to DB and fetch standups
+  await connectDB();
+  const standups = await StandupLog.find().sort({ createdAt: -1 }).limit(50).lean();
 
   return (
     <div className="flex min-h-screen w-full">
@@ -26,7 +27,7 @@ export default async function StandupsPage() {
             
             <div className="space-y-6">
               {standups.map((log: any) => (
-                <div key={log.id} className="p-6 rounded-xl border border-zinc-800 bg-[#121214] shadow-sm">
+                <div key={log._id.toString()} className="p-6 rounded-xl border border-zinc-800 bg-[#121214] shadow-sm">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300 font-medium">

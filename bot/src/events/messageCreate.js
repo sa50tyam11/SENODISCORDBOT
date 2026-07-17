@@ -71,13 +71,12 @@ module.exports = {
 
     // 4. Focus Mode Check
     if (message.mentions.users.size > 0) {
-      const db = require('../database/db');
+      const FocusMode = require('../database/models/FocusMode');
       for (const [id, mentionedUser] of message.mentions.users) {
         if (id === message.author.id) continue;
         
         try {
-          const stmt = db.prepare('SELECT expiresAt FROM focus_mode WHERE userId = ?');
-          const row = stmt.get(id);
+          const row = await FocusMode.findOne({ userId: id });
 
           if (row) {
             const expires = new Date(row.expiresAt);
@@ -86,8 +85,7 @@ module.exports = {
               await message.reply({ content: `Shh! <@${id}> is currently in **Focus Mode** until <t:${Math.floor(expires.getTime() / 1000)}:t>. Please do not disturb them unless it's urgent.` });
             } else {
               // Expired, clean it up
-              const delStmt = db.prepare('DELETE FROM focus_mode WHERE userId = ?');
-              delStmt.run(id);
+              await FocusMode.deleteOne({ userId: id });
             }
           }
         } catch (err) {
