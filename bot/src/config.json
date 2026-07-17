@@ -1,0 +1,29 @@
+{
+  "channels": {
+    "logChannelId": "1527654344827207700",
+    "verifyChannelId": "1503005621400637510",
+    "siteAlertsChannelId": "1527654403715239976",
+    "devActivityChannelId": "1527654514197397645",
+    "standupChannelId": "1527654553095245974"
+  },
+  "roles": {
+    "founderRoleId": "1470824083426906126",
+    "cofounderRoleId": "1527632441202704404",
+    "unverifiedRoleId": "",
+    "memberRoleId": "",
+    "adminRoleId": "",
+    "developerRoleId": "",
+    "designerRoleId": "",
+    "clientContactRoleId": ""
+  },
+  "automod": {
+    "bannedWords": ["spam1", "spam2"],
+    "inviteLinkRegex": "(https?:\\/\\/)?(www\\.)?(discord\\.(gg|io|me|li)|discordapp\\.com\\/invite)\\/[a-zA-Z0-9]+"
+  },
+  "monitoredSites": [
+    {
+      "name": "Client Site A",
+      "url": "https://example.com"
+    }
+  ]
+}
