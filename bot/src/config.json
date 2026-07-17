@@ -17,8 +17,13 @@
     "clientContactRoleId": ""
   },
   "automod": {
-    "bannedWords": ["spam1", "spam2"],
-    "inviteLinkRegex": "(https?:\\/\\/)?(www\\.)?(discord\\.(gg|io|me|li)|discordapp\\.com\\/invite)\\/[a-zA-Z0-9]+"
+    "bannedWords": [
+      "fuck", "shit", "bitch", "asshole", "cunt", "nigger", "faggot", "dick", "pussy",
+      "chutiya", "madarchod", "bhenchod", "bhosdike", "gandu", "randi", "harami", "kutta", "kamina"
+    ],
+    "inviteLinkRegex": "(https?:\\/\\/)?(www\\.)?(discord\\.(gg|io|me|li)|discordapp\\.com\\/invite)\\/[a-zA-Z0-9]+",
+    "blockAllLinks": true,
+    "blockGifs": true
   },
   "monitoredSites": [
     {

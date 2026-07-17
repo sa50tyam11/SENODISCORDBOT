@@ -1,11 +1,40 @@
 const { Events } = require('discord.js');
 const config = require('../config.json');
 const { sendLog } = require('../utils/logger');
+const AutomodStrike = require('../database/models/AutomodStrike');
 
 // Basic spam tracking: user ID -> array of message timestamps
 const userMessages = new Map();
 const SPAM_THRESHOLD = 5; // 5 messages
 const SPAM_WINDOW = 5000; // in 5 seconds
+
+async function handleStrike(message, client, reason) {
+  try {
+    let strikeRecord = await AutomodStrike.findOne({ userId: message.author.id, guildId: message.guild.id });
+    if (!strikeRecord) {
+      strikeRecord = new AutomodStrike({ userId: message.author.id, guildId: message.guild.id });
+    }
+    
+    strikeRecord.strikes += 1;
+    strikeRecord.reasons.push(reason);
+    await strikeRecord.save();
+
+    if (strikeRecord.strikes >= 3) {
+      // 3 strikes -> Kick!
+      await message.member.kick('Reached 3 Automod Strikes');
+      await message.channel.send(`🚨 <@${message.author.id}> has been automatically kicked from the server for reaching 3 automod strikes.`);
+      await sendLog(client, 'Automod: Kicked (3 Strikes)', `Kicked <@${message.author.id}>.\n**Reasons:**\n${strikeRecord.reasons.join('\\n')}`, '#FF0000');
+      // Reset strikes after kick so if they rejoin they start fresh
+      await AutomodStrike.deleteOne({ userId: message.author.id, guildId: message.guild.id });
+    } else {
+      // Just warn
+      await message.channel.send(`⚠️ <@${message.author.id}>, Warning (${strikeRecord.strikes}/3): ${reason}`).then(m => setTimeout(() => m.delete().catch(() => {}), 8000));
+      await sendLog(client, `Automod: Strike ${strikeRecord.strikes}/3`, `Warned <@${message.author.id}> in ${message.channel}\n**Reason:** ${reason}`, '#FFA500');
+    }
+  } catch (error) {
+    console.error('Error handling strike:', error);
+  }
+}
 
 module.exports = {
   name: Events.MessageCreate,
@@ -66,28 +95,48 @@ module.exports = {
     if (message.member.permissions.has('Administrator')) return;
 
     const content = message.content.toLowerCase();
+    const automodConfig = config.automod || {};
 
     // 3. Check Banned Words
-    const bannedWords = config.automod.bannedWords || [];
+    const bannedWords = automodConfig.bannedWords || [];
     for (const word of bannedWords) {
       if (content.includes(word)) {
-        await message.delete();
-        await message.channel.send(`<@${message.author.id}>, your message contained a banned word and was removed.`).then(m => setTimeout(() => m.delete().catch(() => {}), 5000));
-        await sendLog(client, 'Automod: Banned Word', `Deleted message from <@${message.author.id}> in ${message.channel}\n**Word:** ${word}`, '#FF0000');
+        await message.delete().catch(() => {});
+        await handleStrike(message, client, `Used a prohibited word (${word})`);
         return;
       }
     }
 
-    // 4. Check Invite Links
-    const inviteRegex = new RegExp(config.automod.inviteLinkRegex, 'i');
-    if (inviteRegex.test(content)) {
-      await message.delete();
-      await message.channel.send(`<@${message.author.id}>, please do not post invite links.`).then(m => setTimeout(() => m.delete().catch(() => {}), 5000));
-      await sendLog(client, 'Automod: Invite Link', `Deleted invite link from <@${message.author.id}> in ${message.channel}`, '#FF0000');
-      return;
+    // 4. Check GIFs
+    if (automodConfig.blockGifs) {
+      const hasGifLink = content.includes('tenor.com') || content.includes('giphy.com');
+      const hasGifAttachment = message.attachments.some(a => a.contentType && a.contentType.includes('gif'));
+      if (hasGifLink || hasGifAttachment) {
+        await message.delete().catch(() => {});
+        await handleStrike(message, client, 'Posted a GIF');
+        return;
+      }
     }
 
-    // 5. Spam Detection
+    // 5. Check Links
+    if (automodConfig.blockAllLinks) {
+      const linkRegex = /(https?:\/\/[^\s]+)/g;
+      if (linkRegex.test(content)) {
+        await message.delete().catch(() => {});
+        await handleStrike(message, client, 'Posted an unauthorized link');
+        return;
+      }
+    } else if (automodConfig.inviteLinkRegex) {
+      // Fallback to just discord invites if all links aren't blocked
+      const inviteRegex = new RegExp(automodConfig.inviteLinkRegex, 'i');
+      if (inviteRegex.test(content)) {
+        await message.delete().catch(() => {});
+        await handleStrike(message, client, 'Posted a Discord invite link');
+        return;
+      }
+    }
+
+    // 6. Spam Detection
     const now = Date.now();
     if (!userMessages.has(message.author.id)) {
       userMessages.set(message.author.id, []);
@@ -103,19 +152,9 @@ module.exports = {
 
     if (timestamps.length >= SPAM_THRESHOLD) {
       // Possible spam
-      await message.delete().catch(() => {}); // Attempt to delete the trigger message
-      
-      try {
-        // Timeout the user for 5 minutes
-        await message.member.timeout(5 * 60 * 1000, 'Automod: Spamming');
-        await message.channel.send(`<@${message.author.id}> has been timed out for 5 minutes for spamming.`);
-        await sendLog(client, 'Automod: Spam', `Timed out <@${message.author.id}> for spamming in ${message.channel}`, '#FF0000');
-      } catch (err) {
-        console.error('Failed to timeout user for spam:', err);
-      }
-      
-      // Clear their history so we don't keep timing them out on the same burst
-      userMessages.delete(message.author.id);
+      await message.delete().catch(() => {}); 
+      await handleStrike(message, client, 'Spamming the chat');
+      userMessages.delete(message.author.id); // Clear history to prevent multiple strikes at once
     }
   },
 };
