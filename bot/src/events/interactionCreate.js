@@ -29,13 +29,15 @@ module.exports = {
         const unverifiedRoleId = config.roles.unverifiedRoleId;
         const memberRoleId = config.roles.memberRoleId;
 
-        if (!unverifiedRoleId || !memberRoleId) {
+        if (!memberRoleId) {
           return interaction.reply({ content: 'Verification roles are not configured properly.', ephemeral: true });
         }
 
         try {
           await interaction.member.roles.add(memberRoleId);
-          await interaction.member.roles.remove(unverifiedRoleId);
+          if (unverifiedRoleId) {
+            await interaction.member.roles.remove(unverifiedRoleId);
+          }
           await interaction.reply({ content: 'You have been verified! Welcome to SENO Studio.', ephemeral: true });
         } catch (error) {
           console.error(error);
