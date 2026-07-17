@@ -16,17 +16,20 @@ The SENO Studio Bot transforms a standard Discord server into a highly professio
 
 ### 🛡️ Security & Onboarding
 - **Automated Verification Gateway:** New users are isolated in a `#verify` channel. Upon clicking the interactive verification button, they are granted the `Member` role, instantly revealing the rest of the server.
-- **Auto-Moderation:** Automatically detects and deletes spam and unauthorized invite links, logging the infractions.
-- **Admin Moderation Tools:** Integrated slash commands for `/kick`, `/ban`, `/warn`, and `/timeout`.
+- **Advanced 3-Strike Automod:** A ruthless zero-tolerance moderation engine. It detects English/Hinglish curse words, unauthorized links, and GIFs. It deletes the message, issues a warning in the database, and automatically kicks the user on their 3rd strike!
+- **Admin Moderation Tools:** Integrated slash commands for `/kick`, `/ban`, `/warn`, `/purge`, and `/timeout`.
 
 ### 💼 Agency & Sales Operations
 - **Interactive Portfolio (`/portfolio`):** A beautiful, button-driven embed showcasing SENO Studio's work across Web, Bots, and Marketing. Fully configurable via `config.json` without touching code!
 - **Automated Invoicing (`/invoice`):** Instantly drop professional invoices in chat. It auto-generates a **Live QR Code** directly from your UPI ID so clients can just scan and pay.
 - **Contract & NDA Generator (`/contract`):** Generate a standard Service Agreement/NDA right into a client's ticket channel with a simple command.
+- **Custom Pitch Generator (`/pitch`):** Generate targeted, high-conversion pitching messages (in English/Hinglish) for cold outreach based on the client's industry!
 - **Client Ticketing System (`/ticket-setup`):** Deploy a "Request a Quote" button. When clicked, it opens a private text channel visible only to the client and the Founders, capturing Project Type, Budget, and Details.
 
 ### 🛠️ Internal Team Workflows
+- **Idea Bank (`/save-idea` & `/ideas`):** A centralized database for your marketing team to save inspiration, social media trends, and links on the fly. Review them all during your weekly meetings with one command.
 - **Daily Standups (`/standup`):** Team members can log what they did yesterday, what they are doing today, and any blockers. The bot records this in SQLite and broadcasts it to the team channel.
+- **Focus Mode (`/focus`):** Mute pings globally. If someone tags you while you are in focus mode, the bot will automatically reply and tell them not to disturb you.
 - **Role Assignment Panels (`/role-setup`):** Drop interactive panels for developers, designers, and clients to self-assign their roles.
 
 ## 🚀 Setup Instructions
