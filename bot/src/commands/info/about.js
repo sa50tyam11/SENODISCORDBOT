@@ -22,7 +22,7 @@ module.exports = {
         new ButtonBuilder()
           .setLabel('Visit Our Website')
           .setStyle(ButtonStyle.Link)
-          .setURL('https://senostudio.com') // We will update this!
+          .setURL('https://senostudio.in') 
       );
 
     await interaction.reply({ embeds: [embed], components: [row] });
