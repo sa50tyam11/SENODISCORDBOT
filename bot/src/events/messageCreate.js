@@ -93,5 +93,21 @@ module.exports = {
         }
       }
     }
+
+    // 5. Help Desk Auto-Responder
+    const helpDeskChannelId = '1470824084513226940';
+    const helperRoleId = '1470824083393347840';
+
+    if (message.channel.id === helpDeskChannelId && message.mentions.roles.has(helperRoleId)) {
+      const EmbedBuilder = require('discord.js').EmbedBuilder;
+      const embed = new EmbedBuilder()
+        .setTitle('🛠️ Request Received')
+        .setDescription(`Hello <@${message.author.id}>!\n\nThank you for reaching out. A <@&${helperRoleId}> has been notified and will be with you shortly to help resolve your issue.\n\nPlease ensure you have provided as much detail as possible in your message so we can assist you quickly!`)
+        .setColor('#2F3136')
+        .setFooter({ text: 'SENO Studio Support' })
+        .setTimestamp();
+      
+      await message.reply({ embeds: [embed] });
+    }
   },
 };
