@@ -47,5 +47,19 @@ module.exports = {
       );
       // Further actions could be taken here (e.g., auto-kicking or pausing invites)
     }
+
+    // 4. Send Welcome DM
+    try {
+      const welcomeEmbed = new EmbedBuilder()
+        .setTitle('Welcome to SENO Studio! 🎉')
+        .setColor('#84cc16')
+        .setDescription(`Hi <@${member.id}>, welcome to the official SENO Studio Discord server!\n\nTo gain full access to the server, please head over to the <#${config.channels.verifyChannelId}> channel and click the green **Verify** button.\n\nWe're excited to have you here!`)
+        .setFooter({ text: 'SENO Studio' })
+        .setTimestamp();
+        
+      await member.send({ embeds: [welcomeEmbed] });
+    } catch (err) {
+      console.log(`Could not send welcome DM to ${member.user.tag}. They might have DMs disabled.`);
+    }
   },
 };
