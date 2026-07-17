@@ -25,5 +25,13 @@
       "name": "Client Site A",
       "url": "https://example.com"
     }
-  ]
+  ],
+  "tickets": {
+    "categoryId": ""
+  },
+  "payments": {
+    "upi": "your-upi-id@bank",
+    "paypal": "https://paypal.me/yourusername",
+    "bank": "Bank Name: XXX\\nAccount: 123456789\\nIFSC: XXXXXX"
+  }
 }

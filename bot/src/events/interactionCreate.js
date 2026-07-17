@@ -85,6 +85,23 @@ module.exports = {
           console.error(err);
           await interaction.reply({ content: 'Error updating role. Check my permissions!', ephemeral: true });
         }
+      } else if (interaction.customId === 'ticket_create_btn') {
+        const { ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+        const modal = new ModalBuilder()
+          .setCustomId('ticket_modal')
+          .setTitle('Request a Quote');
+
+        const projectType = new TextInputBuilder().setCustomId('ticket_type').setLabel('Project Type (Web, Bot, Marketing)').setStyle(TextInputStyle.Short).setRequired(true);
+        const budget = new TextInputBuilder().setCustomId('ticket_budget').setLabel('Estimated Budget').setStyle(TextInputStyle.Short).setRequired(true);
+        const details = new TextInputBuilder().setCustomId('ticket_details').setLabel('Project Details').setStyle(TextInputStyle.Paragraph).setRequired(true);
+
+        modal.addComponents(
+          new ActionRowBuilder().addComponents(projectType),
+          new ActionRowBuilder().addComponents(budget),
+          new ActionRowBuilder().addComponents(details)
+        );
+
+        await interaction.showModal(modal);
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'standup_modal') {
@@ -126,6 +143,58 @@ module.exports = {
         } catch (error) {
           console.error('Error saving standup:', error);
           await interaction.reply({ content: 'There was an error saving your standup.', ephemeral: true });
+        }
+      } else if (interaction.customId === 'ticket_modal') {
+        const type = interaction.fields.getTextInputValue('ticket_type');
+        const budget = interaction.fields.getTextInputValue('ticket_budget');
+        const details = interaction.fields.getTextInputValue('ticket_details');
+        
+        const config = require('../config.json');
+        const { ChannelType, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+
+        try {
+          const categoryId = config.tickets?.categoryId;
+          
+          const channel = await interaction.guild.channels.create({
+            name: `ticket-${interaction.user.username}`,
+            type: ChannelType.GuildText,
+            parent: categoryId || null,
+            permissionOverwrites: [
+              {
+                id: interaction.guild.id,
+                deny: [PermissionFlagsBits.ViewChannel],
+              },
+              {
+                id: interaction.user.id,
+                allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
+              },
+              {
+                id: config.roles.founderRoleId,
+                allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
+              },
+              {
+                id: config.roles.cofounderRoleId,
+                allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory],
+              }
+            ],
+          });
+
+          const embed = new EmbedBuilder()
+            .setTitle('New Project Inquiry')
+            .setColor('#6C63FF')
+            .setDescription(`Hello <@${interaction.user.id}>! The SENO Studio team will be with you shortly.`)
+            .addFields(
+              { name: 'Project Type', value: type, inline: true },
+              { name: 'Budget', value: budget, inline: true },
+              { name: 'Details', value: details, inline: false }
+            )
+            .setFooter({ text: 'To close this ticket, an admin can type /close-ticket' });
+
+          await channel.send({ content: `<@${interaction.user.id}> <@&${config.roles.founderRoleId}>`, embeds: [embed] });
+          await interaction.reply({ content: `Your ticket has been created! Please head over to <#${channel.id}>.`, ephemeral: true });
+        } catch (error) {
+          console.error(error);
+          await interaction.reply({ content: 'There was an error creating your ticket.', ephemeral: true });
         }
       }
     }
