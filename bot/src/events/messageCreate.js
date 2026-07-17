@@ -13,12 +13,61 @@ module.exports = {
     if (message.author.bot) return;
     if (!message.guild) return;
 
+    // ==========================================
+    // NON-AUTOMOD FEATURES (Runs for everyone)
+    // ==========================================
+
+    // 1. Focus Mode Check
+    if (message.mentions.users.size > 0) {
+      const FocusMode = require('../database/models/FocusMode');
+      for (const [id, mentionedUser] of message.mentions.users) {
+        if (id === message.author.id) continue;
+        
+        try {
+          const row = await FocusMode.findOne({ userId: id });
+
+          if (row) {
+            const expires = new Date(row.expiresAt);
+            if (expires > new Date()) {
+              // User is currently focused
+              await message.reply({ content: `Shh! <@${id}> is currently in **Focus Mode** until <t:${Math.floor(expires.getTime() / 1000)}:t>. Please do not disturb them unless it's urgent.` });
+            } else {
+              // Expired, clean it up
+              await FocusMode.deleteOne({ userId: id });
+            }
+          }
+        } catch (err) {
+          console.error('Focus mode check error:', err);
+        }
+      }
+    }
+
+    // 2. Help Desk Auto-Responder
+    const helpDeskChannelId = '1470824084513226940';
+    const helperRoleId = '1470824083393347840';
+
+    if (message.channel.id === helpDeskChannelId && message.mentions.roles.has(helperRoleId)) {
+      const EmbedBuilder = require('discord.js').EmbedBuilder;
+      const embed = new EmbedBuilder()
+        .setTitle('🛠️ Request Received')
+        .setDescription(`Hello <@${message.author.id}>!\n\nThank you for reaching out. A <@&${helperRoleId}> has been notified and will be with you shortly to help resolve your issue.\n\nPlease ensure you have provided as much detail as possible in your message so we can assist you quickly!`)
+        .setColor('#2F3136')
+        .setFooter({ text: 'SENO Studio Support' })
+        .setTimestamp();
+      
+      await message.reply({ embeds: [embed] });
+    }
+
+    // ==========================================
+    // AUTOMOD FEATURES (Bypassed for Admins)
+    // ==========================================
+
     // Admin bypass for automod (can be tweaked based on roles)
     if (message.member.permissions.has('Administrator')) return;
 
     const content = message.content.toLowerCase();
 
-    // 1. Check Banned Words
+    // 3. Check Banned Words
     const bannedWords = config.automod.bannedWords || [];
     for (const word of bannedWords) {
       if (content.includes(word)) {
@@ -29,7 +78,7 @@ module.exports = {
       }
     }
 
-    // 2. Check Invite Links
+    // 4. Check Invite Links
     const inviteRegex = new RegExp(config.automod.inviteLinkRegex, 'i');
     if (inviteRegex.test(content)) {
       await message.delete();
@@ -38,7 +87,7 @@ module.exports = {
       return;
     }
 
-    // 3. Spam Detection
+    // 5. Spam Detection
     const now = Date.now();
     if (!userMessages.has(message.author.id)) {
       userMessages.set(message.author.id, []);
@@ -67,47 +116,6 @@ module.exports = {
       
       // Clear their history so we don't keep timing them out on the same burst
       userMessages.delete(message.author.id);
-    }
-
-    // 4. Focus Mode Check
-    if (message.mentions.users.size > 0) {
-      const FocusMode = require('../database/models/FocusMode');
-      for (const [id, mentionedUser] of message.mentions.users) {
-        if (id === message.author.id) continue;
-        
-        try {
-          const row = await FocusMode.findOne({ userId: id });
-
-          if (row) {
-            const expires = new Date(row.expiresAt);
-            if (expires > new Date()) {
-              // User is currently focused
-              await message.reply({ content: `Shh! <@${id}> is currently in **Focus Mode** until <t:${Math.floor(expires.getTime() / 1000)}:t>. Please do not disturb them unless it's urgent.` });
-            } else {
-              // Expired, clean it up
-              await FocusMode.deleteOne({ userId: id });
-            }
-          }
-        } catch (err) {
-          console.error('Focus mode check error:', err);
-        }
-      }
-    }
-
-    // 5. Help Desk Auto-Responder
-    const helpDeskChannelId = '1470824084513226940';
-    const helperRoleId = '1470824083393347840';
-
-    if (message.channel.id === helpDeskChannelId && message.mentions.roles.has(helperRoleId)) {
-      const EmbedBuilder = require('discord.js').EmbedBuilder;
-      const embed = new EmbedBuilder()
-        .setTitle('🛠️ Request Received')
-        .setDescription(`Hello <@${message.author.id}>!\n\nThank you for reaching out. A <@&${helperRoleId}> has been notified and will be with you shortly to help resolve your issue.\n\nPlease ensure you have provided as much detail as possible in your message so we can assist you quickly!`)
-        .setColor('#2F3136')
-        .setFooter({ text: 'SENO Studio Support' })
-        .setTimestamp();
-      
-      await message.reply({ embeds: [embed] });
     }
   },
 };
