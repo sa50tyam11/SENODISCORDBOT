@@ -42,8 +42,14 @@ module.exports = {
       .setFooter({ text: 'Thank you for choosing SENO Studio!' })
       .setTimestamp();
 
-    if (qrCodeUrl) {
-      embed.setImage(qrCodeUrl);
+    // Auto-generate a QR code for the UPI ID if no custom image is provided
+    let finalQrUrl = qrCodeUrl;
+    if (!finalQrUrl && upi !== 'Not configured') {
+      finalQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${encodeURIComponent(upi)}`;
+    }
+
+    if (finalQrUrl) {
+      embed.setImage(finalQrUrl);
     }
 
     await interaction.reply({ content: `<@${client.id}>`, embeds: [embed] });
