@@ -7,14 +7,14 @@ module.exports = {
         
   async execute(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle('Welcome to SENO Studio 🚀')
+      .setTitle('SENO Studio 🚀')
       .setColor('#84cc16') // Lime Green
-      .setDescription('**SENO Studio** is a creative digital studio specializing in building amazing web experiences and fostering a collaborative community.')
+      .setDescription('*Where ideas become interfaces.*\n\nAt SENO Studio, we believe great design isn\\'t decoration — it\\'s how an idea learns to speak.\n\nWe\\'re a studio with a simple obsession: turning rough ideas into products that feel effortless. From web applications to custom bots, from full-stack IT solutions to social media marketing that actually moves the needle — every project starts with the same question: not "what can we build," but "what should this feel like to use."\n\nWe work with clients pan-India and globally, building the web, automating the busywork, and helping brands show up online the way they deserve to. Good taste, sharp execution, and people who care — that\\'s SENO Studio.')
       .addFields(
-        { name: 'SENOBOT', value: 'This custom Discord bot was built specifically for managing our studio operations, monitoring sites, and keeping our community safe.' },
-        { name: 'Tech Stack', value: 'Node.js, Discord.js, MongoDB' }
+        { name: 'Our Services', value: 'Web Development · Custom Discord Bots · IT Solutions · Social Media Marketing' },
+        { name: 'SENOBOT', value: 'This custom Discord bot was built specifically for managing our studio operations.' }
       )
-      .setFooter({ text: 'SENO Studio' })
+      .setFooter({ text: 'Design with intention. Built for the world.' })
       .setTimestamp();
 
     const row = new ActionRowBuilder()
@@ -22,7 +22,7 @@ module.exports = {
         new ButtonBuilder()
           .setLabel('Visit Our Website')
           .setStyle(ButtonStyle.Link)
-          .setURL('https://your-website-link-goes-here.com') // We will update this!
+          .setURL('https://senostudio.com') // We will update this!
       );
 
     await interaction.reply({ embeds: [embed], components: [row] });
