@@ -30,8 +30,21 @@
     "categoryId": ""
   },
   "payments": {
-    "upi": "your-upi-id@bank",
+    "upi": "6200964876@axl",
+    "qrCodeUrl": "",
     "paypal": "https://paypal.me/yourusername",
     "bank": "Bank Name: XXX\\nAccount: 123456789\\nIFSC: XXXXXX"
+  },
+  "portfolio": {
+    "web": [
+      {
+        "title": "SENO Studio",
+        "description": "Our main agency website showcasing our premium services.",
+        "url": "https://sennostudio.in",
+        "imageUrl": ""
+      }
+    ],
+    "bot": [],
+    "marketing": []
   }
 }

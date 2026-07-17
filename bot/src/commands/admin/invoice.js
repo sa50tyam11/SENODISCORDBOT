@@ -27,6 +27,7 @@ module.exports = {
     const upi = config.payments?.upi || 'Not configured';
     const paypal = config.payments?.paypal || 'Not configured';
     const bank = config.payments?.bank || 'Not configured';
+    const qrCodeUrl = config.payments?.qrCodeUrl || '';
 
     const embed = new EmbedBuilder()
       .setTitle('SENO Studio Invoice')
@@ -40,6 +41,10 @@ module.exports = {
       )
       .setFooter({ text: 'Thank you for choosing SENO Studio!' })
       .setTimestamp();
+
+    if (qrCodeUrl) {
+      embed.setImage(qrCodeUrl);
+    }
 
     await interaction.reply({ content: `<@${client.id}>`, embeds: [embed] });
   },

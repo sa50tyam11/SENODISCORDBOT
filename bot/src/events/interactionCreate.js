@@ -102,6 +102,29 @@ module.exports = {
         );
 
         await interaction.showModal(modal);
+      } else if (interaction.customId.startsWith('portfolio_')) {
+        const config = require('../config.json');
+        const category = interaction.customId.replace('portfolio_', '');
+        const projects = config.portfolio?.[category] || [];
+        const { EmbedBuilder } = require('discord.js');
+
+        if (projects.length === 0) {
+          return interaction.reply({ content: 'No projects added to this category yet!', ephemeral: true });
+        }
+
+        const embed = new EmbedBuilder()
+          .setTitle(`SENO Studio | ${category.charAt(0).toUpperCase() + category.slice(1)} Portfolio`)
+          .setColor('#6C63FF')
+          .setFooter({ text: 'SENO Studio - We build the future.' });
+
+        projects.forEach((proj, index) => {
+          embed.addFields({ name: `${proj.title}`, value: `${proj.description}\n[View Project](${proj.url})`, inline: false });
+          if (index === 0 && proj.imageUrl) {
+            embed.setImage(proj.imageUrl);
+          }
+        });
+
+        await interaction.update({ embeds: [embed], components: interaction.message.components });
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'standup_modal') {
