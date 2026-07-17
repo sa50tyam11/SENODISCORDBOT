@@ -42,6 +42,18 @@
         "description": "Our main agency website showcasing our premium services.",
         "url": "https://sennostudio.in",
         "imageUrl": ""
+      },
+      {
+        "title": "Satyam Kumar Jha | Portfolio",
+        "description": "Personal developer portfolio and showcase.",
+        "url": "https://satyamkrjha.site",
+        "imageUrl": ""
+      },
+      {
+        "title": "Opticles | Seno Eye",
+        "description": "Live demonstration of the Opticles web project.",
+        "url": "https://seno-eye-demo.netlify.app/",
+        "imageUrl": ""
       }
     ],
     "bot": [],
