@@ -1,57 +1,74 @@
-# SENO Studio - Discord Bot & Dashboard
+<div align="center">
+  <img src="https://via.placeholder.com/150x150/6C63FF/FFFFFF?text=SENO" alt="SENO Studio Logo" width="120" />
+  <h1>SENO Studio Discord Bot</h1>
+  <p><em>The ultimate all-in-one Discord operating system for digital agencies.</em></p>
+  <img src="https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Discord.js-v14-5865F2?style=for-the-badge&logo=discord&logoColor=white" />
+  <img src="https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
+</div>
 
-Welcome to the SENO Studio Discord management system. This project is split into two parts:
-1. **The Discord Bot** (Node.js, Discord.js, SQLite) - Manages the server, moderation, alerts, and verification.
-2. **The Web Dashboard** (Next.js) - _To be built in Phase 3_, providing a web interface to configure the bot and view logs.
+---
 
-## 🚀 Phase 1: Core Bot Features
+## 🌟 Overview
+The SENO Studio Bot transforms a standard Discord server into a highly professional, automated agency headquarters. From locking down the server to unverified users, to generating NDAs, invoices, and managing client support tickets, this bot automates the entire client lifecycle.
 
-This directory (`/bot`) contains the Node.js Discord bot. It handles announcements, moderation (`/kick`, `/ban`, `/warn`, etc.), auto-moderation, verification onboarding, and logging.
+## ✨ Core Features
 
-### 📋 Prerequisites
-- Node.js v18 or newer
-- A Discord Bot Token and Client ID (from the [Discord Developer Portal](https://discord.com/developers/applications))
+### 🛡️ Security & Onboarding
+- **Automated Verification Gateway:** New users are isolated in a `#verify` channel. Upon clicking the interactive verification button, they are granted the `Member` role, instantly revealing the rest of the server.
+- **Auto-Moderation:** Automatically detects and deletes spam and unauthorized invite links, logging the infractions.
+- **Admin Moderation Tools:** Integrated slash commands for `/kick`, `/ban`, `/warn`, and `/timeout`.
 
-### 🛠️ Setup Instructions
+### 💼 Agency & Sales Operations
+- **Interactive Portfolio (`/portfolio`):** A beautiful, button-driven embed showcasing SENO Studio's work across Web, Bots, and Marketing. Fully configurable via `config.json` without touching code!
+- **Automated Invoicing (`/invoice`):** Instantly drop professional invoices in chat. It auto-generates a **Live QR Code** directly from your UPI ID so clients can just scan and pay.
+- **Contract & NDA Generator (`/contract`):** Generate a standard Service Agreement/NDA right into a client's ticket channel with a simple command.
+- **Client Ticketing System (`/ticket-setup`):** Deploy a "Request a Quote" button. When clicked, it opens a private text channel visible only to the client and the Founders, capturing Project Type, Budget, and Details.
+
+### 🛠️ Internal Team Workflows
+- **Daily Standups (`/standup`):** Team members can log what they did yesterday, what they are doing today, and any blockers. The bot records this in SQLite and broadcasts it to the team channel.
+- **Role Assignment Panels (`/role-setup`):** Drop interactive panels for developers, designers, and clients to self-assign their roles.
+
+## 🚀 Setup Instructions
 
 1. **Install Dependencies**
-   Navigate to the `/bot` directory and install the required packages:
+   Navigate to the `/bot` directory and run:
    ```bash
    cd bot
    npm install
    ```
 
-2. **Configure Environment Variables**
-   Copy the provided `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
+2. **Environment Variables**
+   Create a `.env` file in the `/bot` directory and add your credentials:
+   ```env
+   DISCORD_TOKEN=your_bot_token_here
+   DISCORD_CLIENT_ID=your_client_id_here
+   GUILD_ID=your_server_id_here
    ```
-   Fill in your `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, and `GUILD_ID` (your server ID).
 
-3. **Configure IDs in `src/config.json`**
-   Open `src/config.json` and fill in the relevant Discord Channel IDs and Role IDs for your server:
-   - `logChannelId`: Where moderation logs and automod alerts will be sent.
-   - `unverifiedRoleId`: The role given to new joins before they verify.
-   - `memberRoleId`: The role given when they click the Verify button.
+3. **Configure the Bot (`config.json`)**
+   Open `bot/src/config.json`. This is the brain of your agency operations. 
+   - Enter your **UPI ID** in the payments section (the bot will auto-generate the QR code).
+   - Add your portfolio links (Title, URL, Description) into the `portfolio` arrays.
+   - Enter your Role IDs and Channel IDs so the bot knows where to route tickets and logs.
 
 4. **Enable Discord Intents**
-   **CRITICAL:** Go to the Discord Developer Portal > Your Bot > Bot tab. Ensure the following **Privileged Gateway Intents** are toggled **ON**:
-   - `SERVER MEMBERS INTENT` (required for auto-role and logging joins/leaves)
-   - `MESSAGE CONTENT INTENT` (required for auto-moderation of spam and invite links)
-   *(Without these, the bot may crash or fail to function properly.)*
+   Go to the [Discord Developer Portal](https://discord.com/developers/applications) > Your Bot > Bot tab. Ensure the following **Privileged Gateway Intents** are toggled **ON**:
+   - `SERVER MEMBERS INTENT`
+   - `MESSAGE CONTENT INTENT`
 
-### ▶️ Running the Bot
+5. **Start the Bot**
+   ```bash
+   npm run dev
+   ```
 
-To run the bot in development mode (auto-restarts on file changes using Node 18+ `--watch`):
-```bash
-npm run dev
-```
+## 🏗️ Architecture
+- **Language:** JavaScript (CommonJS)
+- **Library:** Discord.js v14
+- **Database:** `better-sqlite3` (File-based, zero configuration required)
+- **Deployment:** Render / PM2
 
-To run normally:
-```bash
-npm start
-```
-
-### 🗄️ Architecture & Storage
-- **Database**: We use `better-sqlite3` for lightweight, file-based storage. A `database.sqlite` file will be created automatically in the `/bot` directory when you start the bot. 
-- **Modular Structure**: Commands are located in `src/commands/` and events in `src/events/`. Adding a new command is as simple as creating a new file in the `commands` directory.
+---
+<div align="center">
+  <i>Built with ❤️ for SENO Studio.</i>
+</div>
