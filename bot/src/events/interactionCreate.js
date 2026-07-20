@@ -126,6 +126,11 @@ module.exports = {
 
         await interaction.update({ embeds: [embed], components: interaction.message.components });
       } else if (interaction.customId.startsWith('client_')) {
+        const mongoose = require('mongoose');
+        if (mongoose.connection.readyState !== 1) {
+          return interaction.reply({ content: '❌ Database is not connected!', ephemeral: true });
+        }
+
         const action = interaction.customId.split('_')[1]; // keep or remove
         const clientId = interaction.customId.split('_')[2];
         const ClientLog = require('../database/models/ClientLog');

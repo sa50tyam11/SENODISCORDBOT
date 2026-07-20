@@ -15,6 +15,11 @@ module.exports = {
         .setRequired(true)),
         
   async execute(interaction) {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return interaction.reply({ content: '❌ Database is not connected! Please add your `MONGODB_URI` in the `.env` file first.', ephemeral: true });
+    }
+
     const name = interaction.options.getString('name');
     const source = interaction.options.getString('source');
 
