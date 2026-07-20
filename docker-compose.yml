@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  senobot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: senobot
+    restart: unless-stopped
+    env_file:
+      - ./bot/.env
+    # Optional: If your bot needs to talk to a local database container, you can add it here.
+    # depends_on:
+    #   - mongo
+
+  # mongo:
+  #   image: mongo:latest
+  #   container_name: senobot-mongo
+  #   restart: unless-stopped
+  #   volumes:
+  #     - senobot-mongo-data:/data/db
+  #   ports:
+  #     - "27017:27017"
+
+# volumes:
+#   senobot-mongo-data:
