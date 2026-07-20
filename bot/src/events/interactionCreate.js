@@ -125,6 +125,36 @@ module.exports = {
         });
 
         await interaction.update({ embeds: [embed], components: interaction.message.components });
+      } else if (interaction.customId.startsWith('client_')) {
+        const action = interaction.customId.split('_')[1]; // keep or remove
+        const clientId = interaction.customId.split('_')[2];
+        const ClientLog = require('../database/models/ClientLog');
+        const { EmbedBuilder } = require('discord.js');
+
+        try {
+          if (action === 'keep') {
+            await ClientLog.findByIdAndUpdate(clientId, { status: 'interested' });
+            
+            const embed = EmbedBuilder.from(interaction.message.embeds[0])
+              .setColor('#00FF00')
+              .setDescription('✅ Client kept (Interested).')
+              .setFooter({ text: 'Client saved to database' });
+              
+            await interaction.update({ embeds: [embed], components: [] });
+          } else if (action === 'remove') {
+            await ClientLog.findByIdAndDelete(clientId);
+            
+            const embed = EmbedBuilder.from(interaction.message.embeds[0])
+              .setColor('#FF0000')
+              .setDescription('❌ Client removed (Not Interested).')
+              .setFooter({ text: 'Client deleted from database' });
+              
+            await interaction.update({ embeds: [embed], components: [] });
+          }
+        } catch (error) {
+          console.error(error);
+          await interaction.reply({ content: 'Error updating client status.', ephemeral: true });
+        }
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'standup_modal') {
